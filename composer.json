@@ -1,0 +1,21 @@
+{
+	"name": "grey-dev-0/web-composer",
+	"version": "0.9",
+	"license": "MIT",
+	"description": "A module that enables developers to install, remove and, update composer packages from web.",
+	"authors": [
+		{
+			"name": "Mohyaddin Saleh",
+			"email": "mo7y.66@gmail.com"
+		}
+	],
+	"require": {
+		"composer/composer": "^1.3",
+		"smarty/smarty": "^3.1"
+	},
+	"autoload": {
+		"psr-4": {
+			"GreyDev\\ConfigExtension\\": "src/"
+		}
+	}
+}

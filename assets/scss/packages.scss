@@ -1,0 +1,32 @@
+.version{ margin-right: 8px; }
+#search{ width: 300px; }
+.col-xs-12:first-child{ margin-bottom: 12px; }
+.list-group-item{
+	.btn-sm{
+		i.material-icons{
+			font-size: 1rem;
+			line-height: 0;
+			vertical-align: middle;
+			margin-bottom: 2px;
+		}
+		&:hover::after{ margin-left: 6px; }
+		&.btn-outline-info:hover::after{ content: 'About'; }
+		&.btn-outline-danger:hover::after{ content: 'Remove'; }
+		&.btn-outline-success:hover::after{ content: 'Update'; }
+	}
+}
+.page-item{
+	.page-link{
+		i.material-icons{
+			line-height: 0;
+			vertical-align: middle;
+			margin-bottom: 4px;
+		}
+	}
+	&:first-child, &:last-child{
+		.page-link{
+			padding-left: 4px;
+			padding-right: 4px;
+		}
+	}
+}
