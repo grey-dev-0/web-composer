@@ -51,13 +51,13 @@ class PackageProcessor{
 			$packages = unserialize(file_get_contents("{$this->cacheDir}/all.cache"));
 		else
 			$this->cacheAllPackages();
-		return (isset($packages))? ['packagesCount' => $packages->count(), 'packages' => $packages->get(0, 10)]
+		return (isset($packages))? ['packagesCount' => $packages->count(), 'packages' => $packages->get(0, 20)]
 			: ['packagesCount' => 0, 'packages' => []];
 	}
 
 	private function cacheInstalledPackages(){
 		$this->initComposer();
-		$input = new ArrayInput(['command' => 'show', '--installed']);
+		$input = new ArrayInput(['command' => 'show']);
 		$this->composer->run($input, $this->consoleOutput);
 		$lines = explode("\n", $this->consoleOutput->fetch());
 		$packages = new Collection();
@@ -74,8 +74,10 @@ class PackageProcessor{
 	}
 
 	public function taskCacheAllPackages(){
+		set_time_limit(0);
+		ignore_user_abort(true);
 		$this->initComposer();
-		$input = new ArrayInput(['command' => 'show', '-a']);
+		$input = new ArrayInput(['command' => 'show', '-a' => true]);
 		$this->composer->run($input, $this->consoleOutput);
 		$lines = explode("\n", $this->consoleOutput->fetch());
 		$packages = new Collection();
@@ -89,14 +91,13 @@ class PackageProcessor{
 			$packages->add(new Package($line[0], null, null));
 		}
 		$packages->cache('storage/composer/all.cache');
-		file_put_contents('storage/composer/debug.log', json_encode($lines, JSON_PRETTY_PRINT));
 	}
 
 	private function cacheAllPackages(){
 		$request = curl_init("{$this->baseUrl}/cache-all-packages");
 		curl_setopt_array($request, [
-			/*CURLOPT_TIMEOUT_MS => 1002,
-			CURLOPT_CONNECTTIMEOUT_MS => 1001,*/
+			CURLOPT_TIMEOUT_MS => 1002,
+			CURLOPT_CONNECTTIMEOUT_MS => 1001,
 			CURLOPT_RETURNTRANSFER => true
 		]);
 		curl_exec($request);

@@ -44,7 +44,7 @@
 							<span><i class="material-icons">chevron_left</i></span>
 						</a>
 					</li>
-					@for($i = 0; $i < ceil($packagesCount/10.0); $i++)
+					@for($i = 0; $i < ceil($packagesCount/20.0); $i++)
 						<li class="page-item @if($i == 0) active @endif" data-page="{{$i+1}}"><a class="page-link" href="#">{{$i+1}}</a></li>
 					@endfor
 					<li class="page-item">
