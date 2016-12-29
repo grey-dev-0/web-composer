@@ -76,6 +76,7 @@ class PackageProcessor{
 	public function taskCacheAllPackages(){
 		set_time_limit(0);
 		ignore_user_abort(true);
+		ini_set('memory_limit', '1G');
 		$this->initComposer();
 		$input = new ArrayInput(['command' => 'show', '-a' => true]);
 		$this->composer->run($input, $this->consoleOutput);
