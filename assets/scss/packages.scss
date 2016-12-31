@@ -1,6 +1,15 @@
 .version{ margin-right: 8px; }
 #search{ width: 300px; }
 .col-xs-12:first-child{ margin-bottom: 12px; }
+.loader{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 24px;
+	-webkit-animation: rotate-right 1s linear infinite;
+	-o-animation: rotate-right 1s linear infinite;
+	animation: rotate-right 1s linear infinite;
+}
 .list-group-item{
 	.btn-sm{
 		i.material-icons{
@@ -13,6 +22,7 @@
 		&.btn-outline-info:hover::after{ content: 'About'; }
 		&.btn-outline-danger:hover::after{ content: 'Remove'; }
 		&.btn-outline-success:hover::after{ content: 'Update'; }
+		&.btn-outline-success.install:hover::after{ content: 'Install'; }
 	}
 }
 .page-item{
@@ -28,5 +38,22 @@
 			padding-left: 4px;
 			padding-right: 4px;
 		}
+	}
+}
+
+@keyframes rotate-right{
+	0%{
+		-webkit-transform: rotateZ(0deg);
+		-moz-transform: rotateZ(0deg);
+		-ms-transform: rotateZ(0deg);
+		-o-transform: rotateZ(0deg);
+		transform: rotateZ(0deg);
+	}
+	100%{
+		-webkit-transform: rotateZ(360deg);
+		-moz-transform: rotateZ(360deg);
+		-ms-transform: rotateZ(360deg);
+		-o-transform: rotateZ(360deg);
+		transform: rotateZ(360deg);
 	}
 }

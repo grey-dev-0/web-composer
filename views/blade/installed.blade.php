@@ -50,7 +50,7 @@
 
 @section('scripts')
 	<script type="text/javascript">
-		urls = { packagesListing: '{{url(config('web-composer.prefix').'/ajax-installed')}}' }
+		var urls = { packagesListing: '{{url(config('web-composer.prefix').'/ajax-installed')}}' }
 	</script>
 	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/bootbox.min.js')}}"></script>
 	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/packages.min.js')}}"></script>

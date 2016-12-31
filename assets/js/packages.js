@@ -5,18 +5,15 @@ $(document).ready(function(){
 		var name = composerPackage.find('.name').text();
 		var version = composerPackage.find('.version').text();
 		var description = composerPackage.find('.hidden-xl-up.hidden-xl-down').text();
-		bootbox.dialog({
-			title: name+' <small class="text-muted">'+version+'</small>',
-			message: description,
-			backdrop: true,
-			onEscape: true,
-			buttons: {
-				ok: {
-					label: 'OK',
-					className: 'btn-outline-primary'
-				}
-			}
-		});
+		if(description == ''){
+			description = '<i class="material-icons loader">rotate_right</i>';
+			var modal = showPackageDetails(name, version, description);
+			getPackageDetails(name, function(data){
+				modal.find('.bootbox-body').text(data.description);
+				composerPackage.find('.hidden-xl-up.hidden-xl-down').text(data.description);
+			});
+		} else
+			showPackageDetails(name, version, description);
 	}).on('click', '.page-link', function(e){
 		// Changing pages when requested.
 		e.preventDefault();
@@ -39,15 +36,20 @@ $(document).ready(function(){
 				var packages = $('.list-group')
 				packages.empty();
 				for(i in data.packages){
+					var version = (data.packages[i].version === null)? '' : data.packages[i].version;
+					var options = (data.packages[i].installed)?
+						'<div class="btn btn-sm btn-outline-success" style="margin-right:4px"><i class="material-icons">update</i></div>\
+						<div class="btn btn-sm btn-outline-danger" style="margin-right:4px"><i class="material-icons">delete_forever</i></div>' :
+						'<div class="btn btn-sm btn-outline-success install" style="margin-right:4px"><i class="material-icons">file_download</i></div>';
+					var description = (data.packages[i].description === null || data.packages[i].description == '')? '' :
+						data.packages[i].description;
 					packages.append('<div class="list-group-item list-group-item-action">\
 						<span class="name">'+data.packages[i].name+'</span>\
 					<div class="float-xs-right">\
-						<span class="version text-muted">'+data.packages[i].version+'</span>\
-					<div class="btn btn-sm btn-outline-success"><i class="material-icons">update</i></div>\
-						<div class="btn btn-sm btn-outline-danger"><i class="material-icons">delete_forever</i></div>\
-						<div class="btn btn-sm btn-outline-info"><i class="material-icons">info_outline</i></div>\
+						<span class="version text-muted">'+version+'</span>'+options+
+						'<div class="btn btn-sm btn-outline-info"><i class="material-icons">info_outline</i></div>\
 						</div>\
-						<div class="hidden-xl-up hidden-xl-down">'+data.packages[i].description+'</div>\
+						<div class="hidden-xl-up hidden-xl-down">'+description+'</div>\
 					</div>')
 				}
 				pageLink.closest('.pagination').find('.page-item').removeClass('active');
@@ -64,6 +66,31 @@ $(document).ready(function(){
 			error: onErrorResponse
 		});
 	});
+
+	function showPackageDetails(name, version, description){
+		return bootbox.dialog({
+			title: name+' <small class="text-muted">'+version+'</small>',
+			message: description,
+			backdrop: true,
+			onEscape: true,
+			buttons: {
+				ok: {
+					label: 'OK',
+					className: 'btn-outline-primary'
+				}
+			}
+		});
+	}
+
+	function getPackageDetails(name, callback){
+		$.ajax({
+			type: 'POST',
+			url: urls.refreshPackage,
+			data: { name: name },
+			success: callback,
+			error: onErrorResponse
+		});
+	}
 
 	function onErrorResponse(xhr){
 		bootbox.alert('Something wrong has happened please check the developer console for more details.');

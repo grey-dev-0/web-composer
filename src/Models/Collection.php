@@ -90,6 +90,16 @@ class Collection implements Iterator{
 		$this->packages[] = $package;
 	}
 
+	public function update($packageData, $cacheFile){
+		$index = array_search($packageData['name'], $this->getNames());
+		$this->packages[$index]->name = $packageData['name'];
+		$this->packages[$index]->description = $packageData['description'];
+		$this->packages[$index]->available_versions = $packageData['available_versions'];
+		$this->packages[$index]->dependencies = $packageData['dependencies'];
+		$this->cache($cacheFile);
+		return $this->packages[$index];
+	}
+
 	/**
 	 * Save cache file of Composer packages data.
 	 *
@@ -102,14 +112,15 @@ class Collection implements Iterator{
 	}
 
 	/**
-	 * Getting all or subset of the packages in the collection.
+	 * Getting one, subset or, all of the packages in the collection.
 	 *
-	 * @param int $offset Index of the first element in the required collection
-	 * @param int $length Number of packages required in the collection
-	 * @return Package[] Array including the requested packages
+	 * @param int $offset Index of the first element in the required collection OR a package index.
+	 * @param int $length Number of packages required in the collection OR null OR 1 for a single package result.
+	 * @return Package[]|Package Array including the requested packages OR the requested package by index.
 	 */
 	public function get($offset = 0, $length = null){
-		return (is_null($length) && $offset == 0)? $this->packages : array_slice($this->packages, $offset, $length);
+		return (is_null($length) && $offset == 0)? $this->packages :
+			((is_null($length) || $length == 1)? $this->packages[$offset] : array_slice($this->packages, $offset, $length));
 	}
 
 	/**
@@ -119,5 +130,17 @@ class Collection implements Iterator{
 	 */
 	public function count(){
 		return count($this->packages);
+	}
+
+	/**
+	 * Getting names of the packages stored in the collection.
+	 *
+	 * @return string[] Array of package names as in the collection.
+	 */
+	public function getNames(){
+		$names = [];
+		foreach($this->packages as &$package)
+			$names[] = $package->name;
+		return $names;
 	}
 }

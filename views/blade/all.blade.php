@@ -19,8 +19,12 @@
 								<span class="name">{{$package->name}}</span>
 								<div class="float-xs-right">
 									<span class="version text-muted">{{$package->version}}</span>
-									<div class="btn btn-sm btn-outline-success"><i class="material-icons">update</i></div>
-									<div class="btn btn-sm btn-outline-danger"><i class="material-icons">delete_forever</i></div>
+									@if($package->installed)
+										<div class="btn btn-sm btn-outline-success update"><i class="material-icons">update</i></div>
+										<div class="btn btn-sm btn-outline-danger"><i class="material-icons">delete_forever</i></div>
+									@else
+										<div class="btn btn-sm btn-outline-success install"><i class="material-icons">file_download</i></div>
+									@endif
 									<div class="btn btn-sm btn-outline-info"><i class="material-icons">info_outline</i></div>
 								</div>
 								<div class="hidden-xl-up hidden-xl-down">{{$package->description}}</div>
@@ -48,7 +52,7 @@
 						<li class="page-item @if($i == 0) active @endif" data-page="{{$i+1}}"><a class="page-link" href="#">{{$i+1}}</a></li>
 					@endfor
 					<li class="page-item" data-page="after"><a class="page-link" href="#">...</a></li>
-					<li class="page-item" data-page="{{$final = ceil($packagesCount/20.0)}}"><a class="page-link" href="#">{{$final}}</a></li>
+					<li class="page-item" data-page="{{$final = ceil($packagesCount/10.0)}}"><a class="page-link" href="#">{{$final}}</a></li>
 					<li class="page-item">
 						<a class="page-link" href="#">
 							<span><i class="material-icons">chevron_right</i></span>
@@ -58,4 +62,15 @@
 			</div>
 		@endif
 	</div>
+@stop
+
+@section('scripts')
+	<script type="text/javascript">
+		var urls = {
+			packagesListing: '{{url(config('web-composer.prefix').'/ajax-all')}}',
+			refreshPackage: '{{url(config('web-composer.prefix').'/refresh-package')}}'
+		}
+	</script>
+	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/bootbox.min.js')}}"></script>
+	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/packages.min.js')}}"></script>
 @stop

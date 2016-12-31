@@ -1,6 +1,6 @@
 <?php namespace GreyDev\WebComposer\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Controller, Request;
 use GreyDev\WebComposer\PackageProcessor;
 
 class MainController extends Controller{
@@ -32,7 +32,16 @@ class MainController extends Controller{
 		return view('web-composer::all', $packagesData);
 	}
 
+	public function getAjaxAll($offset, $length){
+		$packagesData = $this->packageProcessor->getAjaxAll($offset, $length);
+		return response()->json($packagesData);
+	}
+
 	public function getCacheAllPackages(){
 		$this->packageProcessor->taskCacheAllPackages();
+	}
+
+	public function postRefreshPackage(){
+		return response()->json($this->packageProcessor->refreshPackage(Request::input('name')));
 	}
 }

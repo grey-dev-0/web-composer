@@ -29,6 +29,11 @@ class PackageProcessor{
 		$this->baseUrl = $baseUrl;
 	}
 
+	/**
+	 * Getting installed packages and their count (paginated)
+	 *
+	 * @return array Packages collection and count
+	 */
 	public function getInstalled(){
 		if(!is_file("{$this->cacheDir}/installed.cache"))
 			$packages = $this->cacheInstalledPackages();
@@ -39,8 +44,30 @@ class PackageProcessor{
 		return compact('packagesCount', 'packages');
 	}
 
+	/**
+	 * Getting another page of installed packages - total count included in response.
+	 *
+	 * @param $offset int The index of the first package requested in the collection.
+	 * @param $length int Number of packages that should be retrieved from the collection.
+	 * @return array Packages collection including total count.
+	 */
 	public function getAjaxInstalled($offset, $length){
 		$packages = unserialize(file_get_contents("{$this->cacheDir}/installed.cache"));
+		$packagesCount = $packages->count();
+		$packages = $packages->get($offset, $length);
+		return compact('packagesCount', 'packages');
+	}
+
+	/**
+	 * Getting another page of all world's packages - total count included in response.
+	 *
+	 * @param $offset int The index of the first package requested in the collection.
+	 * @param $length int Number of packages that should be retrieved from the collection.
+	 * @return array Packages collection including total count.
+	 */
+	public function getAjaxAll($offset, $length){
+		$this->setupEnvironment();
+		$packages = unserialize(file_get_contents("{$this->cacheDir}/all.cache"));
 		$packagesCount = $packages->count();
 		$packages = $packages->get($offset, $length);
 		return compact('packagesCount', 'packages');
@@ -51,7 +78,7 @@ class PackageProcessor{
 			$packages = unserialize(file_get_contents("{$this->cacheDir}/all.cache"));
 		else
 			$this->cacheAllPackages();
-		return (isset($packages))? ['packagesCount' => $packages->count(), 'packages' => $packages->get(0, 20)]
+		return (isset($packages))? ['packagesCount' => $packages->count(), 'packages' => $packages->get(0, 10)]
 			: ['packagesCount' => 0, 'packages' => []];
 	}
 
@@ -65,33 +92,36 @@ class PackageProcessor{
 			if(empty($line))
 				continue;
 			$line = preg_split('/ +/', $line);
-			$packages->add(new Package($line[0], $line[1], implode(' ', array_values(array_except($line, [0, 1])))));
+			$packages->add(new Package($line[0], $line[1], implode(' ', array_values(array_except($line, [0, 1]))), true));
 		}
-		if(!is_dir('storage/composer'))
-			mkdir('storage/composer');
-		$packages->cache('storage/composer/installed.cache');
+		if(!is_dir($this->cacheDir))
+			mkdir($this->cacheDir);
+		$packages->cache("{$this->cacheDir}/installed.cache");
 		return $packages;
 	}
 
 	public function taskCacheAllPackages(){
-		set_time_limit(0);
-		ignore_user_abort(true);
-		ini_set('memory_limit', '1G');
+		$this->setupEnvironment();
+		$installedPackages = unserialize(file_get_contents("{$this->cacheDir}/installed.cache"));
+		$installedPackagesNames = $installedPackages->getNames();
 		$this->initComposer();
 		$input = new ArrayInput(['command' => 'show', '-a' => true]);
 		$this->composer->run($input, $this->consoleOutput);
 		$lines = explode("\n", $this->consoleOutput->fetch());
 		$packages = new Collection();
-		if(!is_dir('storage/composer'))
-			mkdir('storage/composer');
-		$packages->cache('storage/composer/all.cache');
+		if(!is_dir($this->cacheDir))
+			mkdir($this->cacheDir);
+		$packages->cache("{$this->cacheDir}/all.cache");
 		foreach($lines as &$line){
 			if(empty($line))
 				continue;
 			$line = preg_split('/ +/', $line);
-			$packages->add(new Package($line[0], null, null));
+			if(($i = array_search($line[0], $installedPackagesNames)) !== false)
+				$packages->add($installedPackages->get($i, 1));
+			else
+				$packages->add(new Package($line[0], null, null));
 		}
-		$packages->cache('storage/composer/all.cache');
+		$packages->cache("{$this->cacheDir}/all.cache");
 	}
 
 	private function cacheAllPackages(){
@@ -104,10 +134,58 @@ class PackageProcessor{
 		curl_exec($request);
 	}
 
+	/**
+	 * Refreshing a package details data in the All Packages collection.
+	 *
+	 * @param $name string Package name to be refreshed.
+	 * @return Package|bool Returns full package details or false if package is no longer available.
+	 */
+	public function refreshPackage($name){
+		$this->setupEnvironment();
+		$packages = unserialize(file_get_contents("{$this->cacheDir}/all.cache"));
+		$packageData = $this->getPackageDetails($name);
+		if(!isset($packageData['name']) || is_null($packageData['name']))
+			return false;
+		return $packages->update($packageData, "{$this->cacheDir}/all.cache");
+	}
+
+	private function getPackageDetails($packageName){
+		$this->initComposer();
+		$input = new ArrayInput(['command' => 'show', '-a' => true, 'package' => $packageName]);
+		$this->composer->run($input, $this->consoleOutput);
+		$lines = explode("\n", $this->consoleOutput->fetch());
+		$requires = false;
+		$dependencies = [];
+		do{
+			$line = current($lines);
+			$output = explode(':', $line);
+			switch(trim($output[0])){
+				case 'name': $name = trim($output[1]); break;
+				case 'descrip.': $description = trim($output[1]); break;
+				case 'versions': $available_versions = explode(', ', trim($output[1])); break;
+				case 'requires': case 'requires (dev)': $requires = true; break;
+				default:
+					if($requires){
+						if($output[0] == '')
+							$requires = false;
+						else
+							$dependencies[] = trim($output[0]);
+					}
+			}
+		} while(next($lines));
+		return compact('name', 'description', 'available_versions', 'dependencies');
+	}
+
 	private function initComposer(){
 		$this->composer = new Application();
 		$this->composer->setAutoExit(false);
 		$this->consoleOutput = new BufferedOutput();
 		putenv('COMPOSER_HOME='.storage_path());
+	}
+
+	private function setupEnvironment(){
+		set_time_limit(0);
+		ignore_user_abort(true);
+		ini_set('memory_limit', '1G');
 	}
 }
