@@ -22,7 +22,12 @@
 								<div class="btn btn-sm btn-outline-danger"><i class="material-icons">delete_forever</i></div>
 								<div class="btn btn-sm btn-outline-info"><i class="material-icons">info_outline</i></div>
 							</div>
-							<div class="hidden-xl-up hidden-xl-down">{{$package->description}}</div>
+							<div class="hidden-xl-up hidden-xl-down description">{{$package->description}}</div>
+							<ul class="hidden-xl-up hidden-xl-down versions">
+								@foreach($package->available_versions as &$version)
+									<li>{{$version}}</li>
+								@endforeach
+							</ul>
 						</div>
 					@endforeach
 				</div>

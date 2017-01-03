@@ -1,7 +1,7 @@
 <?php namespace GreyDev\WebComposer\Models;
 
 class Package{
-	public $name, $version, $description, $dependencies, $available_versions, $installed;
+	public $name, $version, $description, $dependencies, $available_versions = [], $installed;
 
 	public function __construct($name, $version, $description, $installed = false, $dependencies = null){
 		$this->name = $name;

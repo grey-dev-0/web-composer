@@ -4,13 +4,13 @@ $(document).ready(function(){
 		var composerPackage = $(this).closest('.list-group-item');
 		var name = composerPackage.find('.name').text();
 		var version = composerPackage.find('.version').text();
-		var description = composerPackage.find('.hidden-xl-up.hidden-xl-down').text();
+		var description = composerPackage.find('.description').text();
 		if(description == ''){
 			description = '<i class="material-icons loader">rotate_right</i>';
 			var modal = showPackageDetails(name, version, description);
 			getPackageDetails(name, function(data){
 				modal.find('.bootbox-body').text(data.description);
-				composerPackage.find('.hidden-xl-up.hidden-xl-down').text(data.description);
+				composerPackage.find('.description').text(data.description);
 			});
 		} else
 			showPackageDetails(name, version, description);
@@ -49,7 +49,7 @@ $(document).ready(function(){
 						<span class="version text-muted">'+version+'</span>'+options+
 						'<div class="btn btn-sm btn-outline-info"><i class="material-icons">info_outline</i></div>\
 						</div>\
-						<div class="hidden-xl-up hidden-xl-down">'+description+'</div>\
+						<div class="hidden-xl-up hidden-xl-down description">'+description+'</div>\
 					</div>')
 				}
 				pageLink.closest('.pagination').find('.page-item').removeClass('active');
