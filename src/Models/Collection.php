@@ -97,7 +97,6 @@ class Collection implements Iterator{
 		$this->packages[$index]->available_versions = $packageData['available_versions'];
 		$this->packages[$index]->dependencies = $packageData['dependencies'];
 		$this->cache($cacheFile);
-		return $this->packages[$index];
 	}
 
 	/**

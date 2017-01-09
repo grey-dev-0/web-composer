@@ -74,6 +74,7 @@ class PackageProcessor{
 	}
 
 	public function getAll(){
+		ini_set('memory_limit', '1G');
 		if(is_file("{$this->cacheDir}/all.cache"))
 			$packages = unserialize(file_get_contents("{$this->cacheDir}/all.cache"));
 		else
@@ -135,20 +136,48 @@ class PackageProcessor{
 	}
 
 	/**
-	 * Refreshing a package details data in the All Packages collection.
+	 * Refreshing a package details data in the All Packages collection (deferred in a background task).
 	 *
 	 * @param $name string Package name to be refreshed.
-	 * @return Package|bool Returns full package details or false if package is no longer available.
+	 * @return array|false Returns full package details or false if package is no longer available.
 	 */
 	public function refreshPackage($name){
-		$this->setupEnvironment();
-		$packages = unserialize(file_get_contents("{$this->cacheDir}/all.cache"));
 		$packageData = $this->getPackageDetails($name);
 		if(!isset($packageData['name']) || is_null($packageData['name']))
 			return false;
-		return $packages->update($packageData, "{$this->cacheDir}/all.cache");
+		$taskRequest = curl_init("{$this->baseUrl}/update-package");
+		curl_setopt_array($taskRequest, [
+			CURLOPT_TIMEOUT_MS => 1002,
+			CURLOPT_CONNECTTIMEOUT_MS => 1001,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => http_build_query(['package' => $packageData, 'file' => "{$this->cacheDir}/all.cache"]),
+			CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded']
+		]);
+		curl_exec($taskRequest);
+		return $packageData;
 	}
 
+	/**
+	 * Background task that refreshes a package info in the requested cache file.
+	 *
+	 * @param $packageData array Associative array that resembles the info of the package to be updated.
+	 * @param $cacheFile string The cache file that contains the package to be updated.
+	 */
+	public function taskRefreshPackage($packageData, $cacheFile){
+		$this->setupEnvironment();
+		$packages = unserialize(file_get_contents($cacheFile));
+		if(!isset($packageData['dependencies']))
+			$packageData['dependencies'] = [];
+		$packages->update($packageData, $cacheFile);
+	}
+
+	/**
+	 * Getting package's info from Composer.
+	 *
+	 * @param $packageName string Name of the package that is queried about.
+	 * @return array Associative array that represents the retrieved package info.
+	 */
 	private function getPackageDetails($packageName){
 		$this->initComposer();
 		$input = new ArrayInput(['command' => 'show', '-a' => true, 'package' => $packageName]);
