@@ -11,4 +11,5 @@ Route::group([
 	Route::get('all', 'MainController@getAll');
 	Route::get('cache-all-packages', 'MainController@getCacheAllPackages');
 	Route::post('refresh-package', 'MainController@postRefreshPackage');
+	Route::post('update-package', 'MainController@postUpdatePackage');
 });
