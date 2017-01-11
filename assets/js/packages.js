@@ -11,6 +11,7 @@ $(document).ready(function(){
 			getPackageDetails(name, function(data){
 				modal.find('.bootbox-body').text(data.description);
 				composerPackage.find('.description').text(data.description);
+				composerPackage.find('.versions').html(renderVersionsListItems(data.available_versions));
 			});
 		} else
 			showPackageDetails(name, version, description);
@@ -90,6 +91,13 @@ $(document).ready(function(){
 			success: callback,
 			error: onErrorResponse
 		});
+	}
+
+	function renderVersionsListItems(versions){
+		var listItems = '';
+		for(var i in versions)
+			listItems += '<li>'+versions[i]+'</li>';
+		return listItems;
 	}
 
 	function onErrorResponse(xhr){
