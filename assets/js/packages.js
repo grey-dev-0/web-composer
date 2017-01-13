@@ -27,7 +27,15 @@ $(document).ready(function(){
 			case (pageIndex == 0): pageNumber = oldPageNumber - 1; break;
 			case (pageIndex == linksCount - 1):
 				pageNumber = oldPageNumber + 1; break;
-			default: pageNumber = parseInt($(this).text());
+			default:
+				if(pageLink.text() == '...'){
+					var direction = pageLink.parent('.page-item').attr('data-page');
+					if(direction == 'after')
+						pageNumber = parseInt(pageLink.parent('.page-item').prev().attr('data-page')) + 1;
+					else
+						pageNumber = parseInt(pageLink.parent('.page-item').next().attr('data-page')) - 1;
+				} else
+					pageNumber = parseInt(pageLink.text());
 		}
 		var offset = (pageNumber - 1)*10;
 		$.ajax({
@@ -62,7 +70,13 @@ $(document).ready(function(){
 					pageLink.closest('.pagination').find('.page-item:last').addClass('disabled');
 				else
 					pageLink.closest('.pagination').find('.page-item:last').removeClass('disabled');
-				$('[data-page="'+pageNumber+'"]').addClass('active');
+				var newPageLink = $('[data-page="'+pageNumber+'"]');
+				if(newPageLink.length > 0)
+					newPageLink.addClass('active');
+				else if(pageNumber < oldPageNumber)
+					replacePages(pageNumber - 9, pageNumber, linksCount, pageNumber);
+				else if(pageNumber > oldPageNumber)
+					replacePages(pageNumber, pageNumber + 9, linksCount, pageNumber);
 			},
 			error: onErrorResponse
 		});
@@ -91,6 +105,24 @@ $(document).ready(function(){
 			success: callback,
 			error: onErrorResponse
 		});
+	}
+
+	function replacePages(start, end, linksCount, activePageNumber){
+		var collection = $();
+		$('.page-item').each(function(i, page){
+			if($(page).attr('data-page') !== undefined && $(page).index() != linksCount - 2)
+				collection = collection.add($(page));
+		});
+		var lastPage = $('.page-item:eq('+(linksCount-2)+')');
+		collection.remove();
+		if(start != 1)
+			$('.page-item:first').after('<div class="page-item" data-page="before"><a href="#" class="page-link">...</a></div>');
+		for(var i = start; i <= end; i++)
+			lastPage.before('<div class="page-item" data-page="'+i+'"><a href="#" class="page-link">'+i+'</a></div>');
+		if(end != lastPage.attr('data-page'))
+			lastPage.before('<div class="page-item" data-page="after"><a href="#" class="page-link">...</a></div>');
+		if(activePageNumber !== undefined)
+			$('[data-page="'+activePageNumber+'"]').addClass('active');
 	}
 
 	function renderVersionsListItems(versions){
