@@ -46,7 +46,7 @@ class MainController extends Controller{
 	}
 
 	public function postUpdatePackage(){
-		$this->packageProcessor->taskURefreshPackage(Request::input('package'), Request::input('file'));
+		$this->packageProcessor->taskRefreshPackage(Request::input('package'), Request::input('file'));
 		return response()->json(['response' => 0]);
 	}
 }
