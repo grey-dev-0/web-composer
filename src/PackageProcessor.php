@@ -126,36 +126,42 @@ class PackageProcessor{
 	}
 
 	private function cacheAllPackages(){
-		$request = curl_init("{$this->baseUrl}/cache-all-packages");
-		curl_setopt_array($request, [
-			CURLOPT_TIMEOUT_MS => 1002,
-			CURLOPT_CONNECTTIMEOUT_MS => 1001,
-			CURLOPT_RETURNTRANSFER => true
-		]);
-		curl_exec($request);
+		$this->makeBackgroundRequest("{$this->baseUrl}/cache-all-packages");
 	}
 
 	/**
 	 * Refreshing a package details data in the All Packages collection.
 	 *
 	 * @param $name string Package name to be refreshed.
-	 * @return Package|bool Returns full package details or false if package is no longer available.
+	 * @return array|false Returns full package details or false if package is no longer available.
 	 */
 	public function refreshPackage($name){
 		$packageData = $this->getPackageDetails($name);
 		if(!isset($packageData['name']) || is_null($packageData['name']))
 			return false;
-		$taskRequest = curl_init("{$this->baseUrl}/update-package");
-		curl_setopt_array($taskRequest, [
-			CURLOPT_TIMEOUT_MS => 1002,
-			CURLOPT_CONNECTTIMEOUT_MS => 1001,
-			CURLOPT_RETURNTRANSFER => true,
+		$this->makeBackgroundRequest("{$this->baseUrl}/update-package", [
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => http_build_query(['package' => $packageData, 'file' => "{$this->cacheDir}/all.cache"]),
 			CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded']
 		]);
-		curl_exec($taskRequest);
 		return $packageData;
+	}
+
+	/**
+	 * Requesting a background task to be run.
+	 *
+	 * @param $url string Task URL to be called.
+	 * @param $options array Extra cURL request options to be set.
+	 * @return string Background task response if returned.
+	 */
+	private function makeBackgroundRequest($url, $options = []){
+		$request = curl_init($url);
+		curl_setopt_array($request, [
+			CURLOPT_TIMEOUT_MS => 1002,
+			CURLOPT_CONNECTTIMEOUT_MS => 1001,
+			CURLOPT_RETURNTRANSFER => true
+		] + $options);
+		return curl_exec($request);
 	}
 
 	/**
