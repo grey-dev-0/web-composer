@@ -1,4 +1,7 @@
 $(document).ready(function(){
+	// Initializing composer console output viewer.
+	var composerConsole = new ComposerConsole(urls.consoleOutput);
+
 	$('body').on('click', '.list-group .btn-sm.btn-outline-info', function(){
 		// Viewing a package's description on a modal dialog when requested.
 		var composerPackage = $(this).closest('.list-group-item');
@@ -93,6 +96,8 @@ $(document).ready(function(){
 			},
 			error: onErrorResponse
 		});
+	}).on('click', '#console', function(){
+		composerConsole.view();
 	});
 
 	function showPackageDetails(name, version, description){

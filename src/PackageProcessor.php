@@ -210,6 +210,16 @@ class PackageProcessor{
 	}
 
 	/**
+	 * Fetching console output content written by other tasks.
+	 *
+	 * @return array Console output content.
+	 */
+	public function fetchConsoleOutput(){
+		$logFile = "{$this->cacheDir}/console.log";
+		return ['content' => ((is_file($logFile))? file_get_contents($logFile) : 'No console output.')];
+	}
+
+	/**
 	 * Requesting a background task to be run.
 	 *
 	 * @param $url string Task URL to be called.
@@ -277,6 +287,9 @@ class PackageProcessor{
 		return compact('name', 'description', 'available_versions', 'dependencies');
 	}
 
+	/**
+	 * Initializing Composer application instance.
+	 */
 	private function initComposer(){
 		$this->composer = new Application();
 		$this->composer->setAutoExit(false);
@@ -285,6 +298,9 @@ class PackageProcessor{
 		putenv('COMPOSER_HOME='.storage_path());
 	}
 
+	/**
+	 * Setting up environment settings for long running tasks.
+	 */
 	private function setupEnvironment(){
 		set_time_limit(0);
 		ignore_user_abort(true);
