@@ -59,4 +59,8 @@ class MainController extends Controller{
 		$this->packageProcessor->taskRemovePackage(Request::input('package'));
 		fclose($this->packageProcessor->consoleLog);
 	}
+
+	public function getConsole(){
+		return response()->json($this->packageProcessor->fetchConsoleOutput());
+	}
 }

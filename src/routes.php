@@ -11,6 +11,7 @@ Route::group([
 	Route::get('all', 'MainController@getAll');
 	Route::post('refresh-package', 'MainController@postRefreshPackage');
 	Route::post('remove-package', 'MainController@postRemovePackage');
+	Route::get('console', 'MainController@getConsole');
 });
 
 Route::group([

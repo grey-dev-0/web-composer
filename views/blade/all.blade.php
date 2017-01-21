@@ -2,6 +2,7 @@
 
 @section('styles')
 	<link rel="stylesheet" href="{{asset('public/vendor/grey-dev-0/web-composer/css/packages.min.css')}}">
+	<link rel="stylesheet" href="{{asset('public/vendor/grey-dev-0/web-composer/css/console.min.css')}}">
 @stop
 
 @section('content')
@@ -64,6 +65,7 @@
 						</a>
 					</li>
 				</ul>
+				<div id="console" class="btn btn-sm pull-right btn-outline-secondary">Console</div>
 			</div>
 		@endif
 	</div>
@@ -72,10 +74,12 @@
 @section('scripts')
 	<script type="text/javascript">
 		var urls = {
+			consoleOutput: '{{url(config('web-composer.prefix').'/console')}}',
 			packagesListing: '{{url(config('web-composer.prefix').'/ajax-all')}}',
 			refreshPackage: '{{url(config('web-composer.prefix').'/refresh-package')}}'
 		}
 	</script>
 	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/bootbox.min.js')}}"></script>
+	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/console.min.js')}}"></script>
 	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/packages.min.js')}}"></script>
 @stop
