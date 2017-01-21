@@ -90,6 +90,19 @@ class Collection implements Iterator{
 		$this->packages[] = $package;
 	}
 
+	/**
+	 * Remove a package from the collection.
+	 *
+	 * @param $package string Name of the package to be removed from the collection.
+	 */
+	public function remove($package){
+		$package = trim($package);
+		foreach($this->packages as $i => &$cPackage)
+			if($package == $cPackage->name)
+				unset($this->packages[$i]);
+		$this->packages = array_values($this->packages);
+	}
+
 	public function update($packageData, $cacheFile){
 		$index = array_search($packageData['name'], $this->getNames());
 		$this->packages[$index]->name = $packageData['name'];

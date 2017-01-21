@@ -5,6 +5,7 @@ use GreyDev\WebComposer\Models\Package;
 use GreyDev\WebComposer\Models\Collection;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\StreamOutput;
 
 class PackageProcessor{
 	/**
@@ -12,7 +13,7 @@ class PackageProcessor{
 	 */
 	private $composer;
 	/**
-	 * @var $consoleOutput BufferedOutput Console output.
+	 * @var $consoleOutput BufferedOutput|StreamOutput Console output.
 	 */
 	private $consoleOutput;
 	/**
@@ -23,10 +24,19 @@ class PackageProcessor{
 	 * @var $baseUrl string Base URL of the application including the web-composer path.
 	 */
 	private $baseUrl;
+	/**
+	 * @var $appKey string Application's internal key for background tasks URL protection.
+	 */
+	private $appKey;
+	/**
+	 * @var resource|null Optional console log file handle.
+	 */
+	public $consoleLog = null;
 
-	public function __construct($cacheDir, $baseUrl){
+	public function __construct($cacheDir, $baseUrl, $appKey){
 		$this->cacheDir = $cacheDir;
 		$this->baseUrl = $baseUrl;
+		$this->appKey = $appKey;
 	}
 
 	/**
@@ -73,6 +83,11 @@ class PackageProcessor{
 		return compact('packagesCount', 'packages');
 	}
 
+	/**
+	 * Getting all packages of the world.
+	 *
+	 * @return array Requested packages including metadata.
+	 */
 	public function getAll(){
 		ini_set('memory_limit', '1G');
 		if(is_file("{$this->cacheDir}/all.cache"))
@@ -83,6 +98,11 @@ class PackageProcessor{
 			: ['packagesCount' => 0, 'packages' => []];
 	}
 
+	/**
+	 * Cache and provide the collection of installed packages.
+	 *
+	 * @return Collection Installed packages collection
+	 */
 	private function cacheInstalledPackages(){
 		$this->initComposer();
 		$input = new ArrayInput(['command' => 'show']);
@@ -101,18 +121,21 @@ class PackageProcessor{
 		return $packages;
 	}
 
+	/**
+	 * Cache all world's packages in background.
+	 */
 	public function taskCacheAllPackages(){
 		$this->setupEnvironment();
+		$packages = new Collection();
+		if(!is_dir($this->cacheDir))
+			mkdir($this->cacheDir);
+		$packages->cache("{$this->cacheDir}/all.cache");
 		$installedPackages = unserialize(file_get_contents("{$this->cacheDir}/installed.cache"));
 		$installedPackagesNames = $installedPackages->getNames();
 		$this->initComposer();
 		$input = new ArrayInput(['command' => 'show', '-a' => true]);
 		$this->composer->run($input, $this->consoleOutput);
 		$lines = explode("\n", $this->consoleOutput->fetch());
-		$packages = new Collection();
-		if(!is_dir($this->cacheDir))
-			mkdir($this->cacheDir);
-		$packages->cache("{$this->cacheDir}/all.cache");
 		foreach($lines as &$line){
 			if(empty($line))
 				continue;
@@ -125,6 +148,9 @@ class PackageProcessor{
 		$packages->cache("{$this->cacheDir}/all.cache");
 	}
 
+	/**
+	 * Cache all world's packages - front-end handler.
+	 */
 	private function cacheAllPackages(){
 		$this->makeBackgroundRequest("{$this->baseUrl}/cache-all-packages");
 	}
@@ -141,10 +167,46 @@ class PackageProcessor{
 			return false;
 		$this->makeBackgroundRequest("{$this->baseUrl}/update-package", [
 			CURLOPT_POST => true,
-			CURLOPT_POSTFIELDS => http_build_query(['package' => $packageData, 'file' => "{$this->cacheDir}/all.cache"]),
-			CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded']
+			CURLOPT_POSTFIELDS => http_build_query(['package' => $packageData, 'file' => "{$this->cacheDir}/all.cache"])
 		]);
 		return $packageData;
+	}
+
+	/**
+	 * Uninstall an existing package from the application - front-end handler.
+	 *
+	 * @param $package string Package name to be removed.
+	 */
+	public function removePackage($package){
+		$this->makeBackgroundRequest("{$this->baseUrl}/task-remove-package", [
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => http_build_query(compact('package'))
+		]);
+	}
+
+	/**
+	 * Uninstall an existing package from the application - background task.
+	 *
+	 * @param $package string Package name to be removed.
+	 */
+	public function taskRemovePackage($package){
+		$this->setupEnvironment();
+		$this->initComposer();
+		$input = new ArrayInput(['command' => 'remove', 'packages' => [$package]]);
+		$this->composer->run($input, $this->consoleOutput);
+		$this->removePackageFromCache($package, "{$this->cacheDir}/installed.cache");
+	}
+
+	/**
+	 * Removing a package from a cached collection.
+	 *
+	 * @param $package string Name of the package to be removed from the cache.
+	 * @param $cacheFile string Filename where cache is stored.
+	 */
+	private function removePackageFromCache($package, $cacheFile){
+		$packages = unserialize(file_get_contents($cacheFile));
+		$packages->remove($package);
+		$packages->cache($cacheFile);
 	}
 
 	/**
@@ -159,7 +221,11 @@ class PackageProcessor{
 		curl_setopt_array($request, [
 			CURLOPT_TIMEOUT_MS => 1002,
 			CURLOPT_CONNECTTIMEOUT_MS => 1001,
-			CURLOPT_RETURNTRANSFER => true
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_HTTPHEADER => [
+				'Content-Type: application/x-www-form-urlencoded',
+				"App-Key: {$this->appKey}",
+			]
 		] + $options);
 		return curl_exec($request);
 	}
@@ -214,7 +280,8 @@ class PackageProcessor{
 	private function initComposer(){
 		$this->composer = new Application();
 		$this->composer->setAutoExit(false);
-		$this->consoleOutput = new BufferedOutput();
+		$this->consoleOutput = (is_null($this->consoleLog))?
+			new BufferedOutput() : new StreamOutput($this->consoleLog);
 		putenv('COMPOSER_HOME='.storage_path());
 	}
 
