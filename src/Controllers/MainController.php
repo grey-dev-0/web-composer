@@ -10,7 +10,7 @@ class MainController extends Controller{
 	private $packageProcessor;
 
 	public function __construct(){
-		$this->packageProcessor = new PackageProcessor('storage/composer', url(config('web-composer.prefix')));
+		$this->packageProcessor = new PackageProcessor('storage/composer', url(config('web-composer.prefix')), env('APP_KEY'));
 	}
 
 	public function getIndex(){
@@ -48,5 +48,15 @@ class MainController extends Controller{
 	public function postUpdatePackage(){
 		$this->packageProcessor->taskRefreshPackage(Request::input('package'), Request::input('file'));
 		return response()->json(['response' => 0]);
+	}
+
+	public function postRemovePackage(){
+		$this->packageProcessor->removePackage(Request::input('package'));
+	}
+
+	public function postTaskRemovePackage(){
+		$this->packageProcessor->consoleLog = fopen('storage/composer/console.log', 'a+');
+		$this->packageProcessor->taskRemovePackage(Request::input('package'));
+		fclose($this->packageProcessor->consoleLog);
 	}
 }
