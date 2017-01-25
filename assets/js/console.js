@@ -34,23 +34,13 @@
 		 * Viewing Console output data in a custom bootbox dialog.
 		 */
 		view: function(){
-			var consoleView = bootbox.dialog({
-				title: 'Composer Console Output',
-				message: '<i class="material-icons loader">rotate_right</i>',
-				backdrop: true,
-				onEscape: true,
-				buttons: {
-					ok: {
-						label: 'OK',
-						className: 'btn-outline-primary'
-					}
-				}
-			});
+			var consoleView = $('#console-content').html('<i class="material-icons loader">rotate_right</i>').toggleClass('hidden-xs-up hidden-xs-down');
+			$('#open-console').toggleClass('active');
+			$(window).scrollTop($('body').height());
 			do{} while(this.content === undefined);
 			if(this.content == '')
 				this.content = 'Console output is empty.';
-			consoleView.find('.modal-body').attr('id', 'console-output')
-				.find('.bootbox-body').html('<pre><code>'+this.content+'</code></pre>');
+			consoleView.html('<pre><code>'+this.content+'</code></pre>');
 		},
 		/**
 		 * Showing an error message while logging the error occurred in the developer console.

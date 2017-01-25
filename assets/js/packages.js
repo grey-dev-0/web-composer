@@ -19,13 +19,13 @@ $(document).ready(function(){
 		} else
 			showPackageDetails(name, version, description);
 	}).on('click', '.list-group .btn-sm.btn-outline-danger', function(){
-		var package = $(this).closest('.list-group-item').find('.name').text();
-		bootbox.confirm('Are you sure about deleting '+package+' from the application?', function(confirm){
+		var packageName = $(this).closest('.list-group-item').find('.name').text();
+		bootbox.confirm('Are you sure about deleting '+packageName+' from the application?', function(confirm){
 			if(confirm){
 				$.ajax({
 					url: urls.removePackage,
 					type: 'POST',
-					data: { package: package },
+					data: { package: packageName },
 					success: function(){ bootbox.alert('The package is being uninstalled, please refer to console for more details.'); },
 					error: onErrorResponse
 				});
@@ -96,7 +96,7 @@ $(document).ready(function(){
 			},
 			error: onErrorResponse
 		});
-	}).on('click', '#console', function(){
+	}).on('click', '#open-console', function(){
 		composerConsole.view();
 	});
 
