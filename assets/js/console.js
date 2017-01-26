@@ -36,7 +36,6 @@
 		view: function(){
 			var consoleView = $('#console-content').html('<i class="material-icons loader">rotate_right</i>').toggleClass('hidden-xs-up hidden-xs-down');
 			$('#open-console').toggleClass('active');
-			$(window).scrollTop($('body').height());
 			do{} while(this.content === undefined);
 			if(this.content == '')
 				this.content = 'Console output is empty.';

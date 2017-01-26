@@ -3,7 +3,8 @@
 @append
 
 @section('content')
-	<div class="row" id="console">
+	<div id="console-placeholder"></div>
+	<div class="container" id="console">
 		<div id="console-tab" class="bg-faded text-xs-right">
 			<div class="btn btn-secondary btn-sm" id="open-console">Console</div>
 		</div>
