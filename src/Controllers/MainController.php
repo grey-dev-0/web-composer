@@ -18,23 +18,23 @@ class MainController extends Controller{
 	}
 
 	public function getInstalled(){
-		$packagesData = $this->packageProcessor->getInstalled();
-		return view('web-composer::installed', $packagesData);
+		return view('web-composer::installed', $this->packageProcessor->getInstalled());
 	}
 
-	public function getAjaxInstalled($offset, $length){
-		$packagesData = $this->packageProcessor->getAjaxInstalled($offset, $length);
-		return response()->json($packagesData);
+	public function postAjaxInstalled($offset, $length){
+		return response()->json($this->packageProcessor->postAjaxInstalled($offset, $length));
 	}
 
 	public function getAll(){
-		$packagesData = $this->packageProcessor->getAll();
-		return view('web-composer::all', $packagesData);
+		return view('web-composer::all', $this->packageProcessor->getAll());
 	}
 
-	public function getAjaxAll($offset, $length){
-		$packagesData = $this->packageProcessor->getAjaxAll($offset, $length);
-		return response()->json($packagesData);
+	public function postAjaxAll($offset, $length){
+		return response()->json($this->packageProcessor->postAjaxAll($offset, $length));
+	}
+
+	public function postAjaxSearch($cache, $offset, $length){
+		return response()->json($this->packageProcessor->postAjaxSearch($cache, $offset, $length, Request::input('query')));
 	}
 
 	public function getCacheAllPackages(){

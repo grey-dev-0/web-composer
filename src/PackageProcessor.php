@@ -61,7 +61,7 @@ class PackageProcessor{
 	 * @param $length int Number of packages that should be retrieved from the collection.
 	 * @return array Packages collection including total count.
 	 */
-	public function getAjaxInstalled($offset, $length){
+	public function postAjaxInstalled($offset, $length){
 		$packages = unserialize(file_get_contents("{$this->cacheDir}/installed.cache"));
 		$packagesCount = $packages->count();
 		$packages = $packages->get($offset, $length);
@@ -75,9 +75,27 @@ class PackageProcessor{
 	 * @param $length int Number of packages that should be retrieved from the collection.
 	 * @return array Packages collection including total count.
 	 */
-	public function getAjaxAll($offset, $length){
+	public function postAjaxAll($offset, $length){
 		$this->setupEnvironment();
 		$packages = unserialize(file_get_contents("{$this->cacheDir}/all.cache"));
+		$packagesCount = $packages->count();
+		$packages = $packages->get($offset, $length);
+		return compact('packagesCount', 'packages');
+	}
+
+	/**
+	 * Search packages according to requested query.
+	 *
+	 * @param $cache string Cache filename including path.
+	 * @param $offset int The index of the first package requested in the collection.
+	 * @param $length int Number of packages that should be retrieved in the search results.
+	 * @param $query string Query to be search for in the packages.
+	 * @return array Resultant packages collection including total count.
+	 */
+	public function postAjaxSearch($cache, $offset, $length, $query){
+		$this->setupEnvironment();
+		$packages = unserialize(file_get_contents("{$this->cacheDir}/{$cache}.cache"));
+		$packages->search($query);
 		$packagesCount = $packages->count();
 		$packages = $packages->get($offset, $length);
 		return compact('packagesCount', 'packages');

@@ -8,7 +8,13 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<h4 class="float-xs-left">All Packages</h4>
-			<input type="text" placeholder="Search" id="search" class="form-control float-xs-right card-outline-info">
+			<div id="search">
+				<input type="text" placeholder="Search" class="form-control float-xs-right card-outline-info">
+				<div id="search-actions">
+					<i class="material-icons" id="search-btn">search</i>
+					<i class="material-icons text-muted hidden-xs-up hidden-xs-down" id="search-clear">clear</i>
+				</div>
+			</div>
 		</div>
 		<div class="col-xs-12">
 			@if($packagesCount > 0)
@@ -74,7 +80,8 @@
 		var urls = {
 			consoleOutput: '{{url(config('web-composer.prefix').'/console')}}',
 			packagesListing: '{{url(config('web-composer.prefix').'/ajax-all')}}',
-			refreshPackage: '{{url(config('web-composer.prefix').'/refresh-package')}}'
+			refreshPackage: '{{url(config('web-composer.prefix').'/refresh-package')}}',
+			searchPackages: '{{url(config('web-composer.prefix').'/ajax-search/all')}}'
 		}
 	</script>
 	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/bootbox.min.js')}}"></script>

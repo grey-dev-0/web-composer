@@ -29,8 +29,8 @@ class MainController{
 		$this->view('installed.tpl', $packagesData);
 	}
 
-	public function getAjaxInstalled($offset, $length){
-		$packagesData = $this->packageProcessor->getAjaxInstalled($offset, $length);
+	public function postAjaxInstalled($offset, $length){
+		$packagesData = $this->packageProcessor->postAjaxInstalled($offset, $length);
 		$this->jsonRespond($packagesData);
 	}
 

@@ -8,7 +8,13 @@
 	<div class="row">
 		<div class="col-xs-12">
 			<h4 class="float-xs-left">Installed Packages</h4>
-			<input type="text" placeholder="Search" id="search" class="form-control float-xs-right card-outline-info">
+			<div id="search">
+				<input type="text" placeholder="Search" class="form-control float-xs-right card-outline-info">
+				<div id="search-actions">
+					<i class="material-icons" id="search-btn">search</i>
+					<i class="material-icons text-muted hidden-xs-up hidden-xs-down" id="search-clear">clear</i>
+				</div>
+			</div>
 		</div>
 		<div class="col-xs-12">
 			<div class="card card-outline-success">
@@ -58,7 +64,8 @@
 		var urls = {
 			consoleOutput: '{{url(config('web-composer.prefix').'/console')}}',
 			packagesListing: '{{url(config('web-composer.prefix').'/ajax-installed')}}',
-			removePackage: '{{url(config('web-composer.prefix').'/remove-package')}}'
+			removePackage: '{{url(config('web-composer.prefix').'/remove-package')}}',
+			searchPackages: '{{url(config('web-composer.prefix').'/ajax-search/installed')}}'
 		};
 	</script>
 	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/bootbox.min.js')}}"></script>

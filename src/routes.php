@@ -6,9 +6,10 @@ Route::group([
 ], function(){
 	Route::get('/', 'MainController@getIndex');
 	Route::get('installed', 'MainController@getInstalled');
-	Route::get('ajax-installed/{offset}/{length}', 'MainController@getAjaxInstalled');
-	Route::get('ajax-all/{offset}/{length}', 'MainController@getAjaxAll');
+	Route::post('ajax-installed/{offset}/{length}', 'MainController@postAjaxInstalled');
+	Route::post('ajax-all/{offset}/{length}', 'MainController@postAjaxAll');
 	Route::get('all', 'MainController@getAll');
+	Route::post('ajax-search/{cache}/{offset}/{length}', 'MainController@postAjaxSearch');
 	Route::post('refresh-package', 'MainController@postRefreshPackage');
 	Route::post('remove-package', 'MainController@postRemovePackage');
 	Route::get('console', 'MainController@getConsole');

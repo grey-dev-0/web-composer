@@ -1,5 +1,16 @@
 .version{ margin-right: 8px; }
-#search{ width: 300px; }
+#search{
+	float: right;
+	width: 300px;
+	position: relative;
+	#search-actions{
+		position: absolute;
+		top: 8px;
+		right: 8px;
+		cursor: pointer;
+		#search-btn{ color: #5bc0de; }
+	}
+}
 .col-xs-12:first-child{ margin-bottom: 12px; }
 .loader{
 	display: block;

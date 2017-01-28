@@ -1,6 +1,12 @@
 $(document).ready(function(){
 	// Initializing composer console output viewer.
 	var composerConsole = new ComposerConsole(urls.consoleOutput);
+	// Packages list is a search result or a standard output.
+	var isSearch = false;
+	// Pagination related variables.
+	var pageLink, pageNumber, oldPageNumber, linksCount, replacePagination = false;
+	// Original pagination data.
+	var originalPages = $('.pagination').clone();
 
 	$('body').on('click', '.list-group .btn-sm.btn-outline-info', function(){
 		// Viewing a package's description on a modal dialog when requested.
@@ -34,11 +40,55 @@ $(document).ready(function(){
 	}).on('click', '.page-link', function(e){
 		// Changing pages when requested.
 		e.preventDefault();
-		var pageLink = $(this);
+		pageLink = $(this);
+		setPageNumber(pageLink);
+		var offset = (pageNumber - 1)*10;
+		$.ajax({
+			url: ((!isSearch)? urls.packagesListing : urls.searchPackages)+'/'+offset+'/10',
+			type: 'POST',
+			data: { query: $('#search').find('input').val() },
+			success: renderPackages,
+			error: onErrorResponse
+		});
+	}).on('click', '#open-console', function(){
+		composerConsole.view();
+	}).on('click', '#search-btn', search).on('change', '#search input', function(evt){
+		// Searching for a package
+		if($(this).val() != '')
+			search();
+		else
+			clearSearch();
+	}).on('click', '#search-clear', clearSearch);
+
+	function search(){
+		isSearch = true;
+		replacePagination = true;
+		$('#search-clear').removeClass('hidden-xs-down hidden-xs-up');
+		pageNumber = 1;
+		$.ajax({
+			url: urls.searchPackages+'/0/10',
+			type: 'POST',
+			data: { query: $('#search').find('input').val() },
+			success: renderPackages,
+			error: onErrorResponse
+		});
+	}
+
+	function clearSearch(){
+		if(isSearch){
+			$('.pagination').before(originalPages);
+			$('.pagination:last').remove();
+		}
+		isSearch = false;
+		$('#search-clear').addClass('hidden-xs-down hidden-xs-up');
+		$('#search').find('input').val('');
+		$('.page-item:eq(1) .page-link').trigger('click');
+	}
+
+	function setPageNumber(pageLink){
 		var pageIndex = pageLink.parent('.page-item').index();
-		var linksCount = pageLink.closest('.pagination').find('.page-item').length;
-		var oldPageNumber = parseInt(pageLink.closest('.pagination').find('.active').attr('data-page'));
-		var pageNumber;
+		linksCount = pageLink.closest('.pagination').find('.page-item').length;
+		oldPageNumber = parseInt(pageLink.closest('.pagination').find('.active').attr('data-page'));
 		switch(true){
 			case (pageIndex == 0): pageNumber = oldPageNumber - 1; break;
 			case (pageIndex == linksCount - 1):
@@ -53,52 +103,50 @@ $(document).ready(function(){
 				} else
 					pageNumber = parseInt(pageLink.text());
 		}
-		var offset = (pageNumber - 1)*10;
-		$.ajax({
-			url: urls.packagesListing+'/'+offset+'/10',
-			type: 'GET',
-			success: function(data){
-				var packages = $('.list-group')
-				packages.empty();
-				for(i in data.packages){
-					var version = (data.packages[i].version === null)? '' : data.packages[i].version;
-					var options = (data.packages[i].installed)?
-						'<div class="btn btn-sm btn-outline-success" style="margin-right:4px"><i class="material-icons">update</i></div>\
-						<div class="btn btn-sm btn-outline-danger" style="margin-right:4px"><i class="material-icons">delete_forever</i></div>' :
-						'<div class="btn btn-sm btn-outline-success install" style="margin-right:4px"><i class="material-icons">file_download</i></div>';
-					var description = (data.packages[i].description === null || data.packages[i].description == '')? '' :
-						data.packages[i].description;
-					packages.append('<div class="list-group-item list-group-item-action">\
+	}
+
+	function renderPackages(data){
+		var packages = $('.list-group');
+		packages.empty();
+		for(i in data.packages){
+			var version = (data.packages[i].version === null)? '' : data.packages[i].version;
+			var options = (data.packages[i].installed)?
+				'<div class="btn btn-sm btn-outline-success" style="margin-right:4px"><i class="material-icons">update</i></div>\
+				<div class="btn btn-sm btn-outline-danger" style="margin-right:4px"><i class="material-icons">delete_forever</i></div>' :
+				'<div class="btn btn-sm btn-outline-success install" style="margin-right:4px"><i class="material-icons">file_download</i></div>';
+			var description = (data.packages[i].description === null || data.packages[i].description == '')? '' :
+				data.packages[i].description;
+			packages.append('<div class="list-group-item list-group-item-action">\
 						<span class="name">'+data.packages[i].name+'</span>\
 					<div class="float-xs-right">\
 						<span class="version text-muted">'+version+'</span>'+options+
-						'<div class="btn btn-sm btn-outline-info"><i class="material-icons">info_outline</i></div>\
-						</div>\
-						<div class="hidden-xl-up hidden-xl-down description">'+description+'</div>\
+				'<div class="btn btn-sm btn-outline-info"><i class="material-icons">info_outline</i></div>\
+				</div>\
+				<div class="hidden-xl-up hidden-xl-down description">'+description+'</div>\
 					</div>')
-				}
-				pageLink.closest('.pagination').find('.page-item').removeClass('active');
-				if(pageNumber == 1)
-					pageLink.closest('.pagination').find('.page-item:first').addClass('disabled');
-				else
-					pageLink.closest('.pagination').find('.page-item:first').removeClass('disabled');
-				if(pageNumber == linksCount - 2)
-					pageLink.closest('.pagination').find('.page-item:last').addClass('disabled');
-				else
-					pageLink.closest('.pagination').find('.page-item:last').removeClass('disabled');
-				var newPageLink = $('[data-page="'+pageNumber+'"]');
-				if(newPageLink.length > 0)
-					newPageLink.addClass('active');
-				else if(pageNumber < oldPageNumber)
-					replacePages(pageNumber - 9, pageNumber, linksCount, pageNumber);
-				else if(pageNumber > oldPageNumber)
-					replacePages(pageNumber, pageNumber + 9, linksCount, pageNumber);
-			},
-			error: onErrorResponse
-		});
-	}).on('click', '#open-console', function(){
-		composerConsole.view();
-	});
+		}
+		if(replacePagination){
+			switchPagination(data.packagesCount);
+			replacePagination = false;
+		} else{
+			pageLink.closest('.pagination').find('.page-item').removeClass('active');
+			if(pageNumber == 1)
+				pageLink.closest('.pagination').find('.page-item:first').addClass('disabled');
+			else
+				pageLink.closest('.pagination').find('.page-item:first').removeClass('disabled');
+			if(pageNumber == linksCount - 2)
+				pageLink.closest('.pagination').find('.page-item:last').addClass('disabled');
+			else
+				pageLink.closest('.pagination').find('.page-item:last').removeClass('disabled');
+			var newPageLink = $('[data-page="'+pageNumber+'"]');
+			if(newPageLink.length > 0)
+				newPageLink.addClass('active');
+			else if(pageNumber < oldPageNumber)
+				replacePages(pageNumber - 9, pageNumber, linksCount, pageNumber);
+			else if(pageNumber > oldPageNumber)
+				replacePages(pageNumber, pageNumber + 9, linksCount, pageNumber);
+		}
+	}
 
 	function showPackageDetails(name, version, description){
 		return bootbox.dialog({
@@ -125,6 +173,14 @@ $(document).ready(function(){
 		});
 	}
 
+	/**
+	 * Replace page numbers for overflowing pagination.
+	 *
+	 * @param start int First page number to be started from.
+	 * @param end int Last page number to be ended to.
+	 * @param linksCount int Count of links of the pagination.
+	 * @param activePageNumber int Current page number.
+	 */
 	function replacePages(start, end, linksCount, activePageNumber){
 		var collection = $();
 		$('.page-item').each(function(i, page){
@@ -141,6 +197,20 @@ $(document).ready(function(){
 			lastPage.before('<div class="page-item" data-page="after"><a href="#" class="page-link">...</a></div>');
 		if(activePageNumber !== undefined)
 			$('[data-page="'+activePageNumber+'"]').addClass('active');
+	}
+
+	/**
+	 * Switching pagination from standard output to search results pagination.
+	 *
+	 * @param packagesCount int Count of resultant packages to compute required number of pages.
+	 */
+	function switchPagination(packagesCount){
+		$('.pagination').before($('<ul class="pagination"/>').append(originalPages.find('.page-item:first, .page-item:last').clone()));
+		$('.pagination:last').detach();
+		var pages = Math.floor(packagesCount / 10.0);
+		for(var i = 1; i <= pages; i++)
+			$('.page-item:last').before($('<div class="page-item" data-page="'+i+'"><a href="#" class="page-link">'+i+'</a></div>'));
+		$('.page-item:eq(1)').addClass('active');
 	}
 
 	function renderVersionsListItems(versions){

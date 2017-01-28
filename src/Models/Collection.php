@@ -103,6 +103,12 @@ class Collection implements Iterator{
 		$this->packages = array_values($this->packages);
 	}
 
+	/**
+	 * Updating a package information.
+	 *
+	 * @param $packageData array Package new data provided for the update.
+	 * @param $cacheFile string Cache filename where the packages are stored.
+	 */
 	public function update($packageData, $cacheFile){
 		$index = array_search($packageData['name'], $this->getNames());
 		$this->packages[$index]->name = $packageData['name'];
@@ -154,5 +160,18 @@ class Collection implements Iterator{
 		foreach($this->packages as &$package)
 			$names[] = $package->name;
 		return $names;
+	}
+
+	/**
+	 * Filtering packages collection to include only the packages that matches the query provided.
+	 *
+	 * @param $query string Search query to be applied on the packages collection.
+	 */
+	public function search($query){
+		$query = str_replace('/', '\/', $query);
+		foreach($this->packages as $i => &$package)
+			if(!preg_match("/$query/", $package->name))
+				unset($this->packages[$i]);
+		$this->packages = array_values($this->packages);
 	}
 }
