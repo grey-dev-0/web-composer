@@ -191,6 +191,33 @@ class PackageProcessor{
 	}
 
 	/**
+	 * Updating an existing package to a newer version - front-end handler.
+	 *
+	 * @param $package string Package name - optionally including version - to be updated.
+	 */
+	public function upgradePackage($package){
+		list($package, $version) = explode(':', $package);
+		$this->makeBackgroundRequest("{$this->baseUrl}/task-upgrade-package", [
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => http_build_query(compact('package', 'version'))
+		]);
+	}
+
+	/**
+	 * Updating an existing package to a newer version - background task.
+	 *
+	 * @param $package string Package name to be updated.
+	 * @param $version string Package version to be installed.
+	 */
+	public function taskUpgradePackage($package, $version){
+		$this->setupEnvironment();
+		$this->initComposer();
+		$input = new ArrayInput(['command' => 'require', 'packages' => ["$package:$version"]]);
+		$this->composer->run($input, $this->consoleOutput);
+		$this->refreshCache();
+	}
+
+	/**
 	 * Uninstall an existing package from the application - front-end handler.
 	 *
 	 * @param $package string Package name to be removed.
@@ -212,19 +239,7 @@ class PackageProcessor{
 		$this->initComposer();
 		$input = new ArrayInput(['command' => 'remove', 'packages' => [$package]]);
 		$this->composer->run($input, $this->consoleOutput);
-		$this->removePackageFromCache($package, "{$this->cacheDir}/installed.cache");
-	}
-
-	/**
-	 * Removing a package from a cached collection.
-	 *
-	 * @param $package string Name of the package to be removed from the cache.
-	 * @param $cacheFile string Filename where cache is stored.
-	 */
-	private function removePackageFromCache($package, $cacheFile){
-		$packages = unserialize(file_get_contents($cacheFile));
-		$packages->remove($package);
-		$packages->cache($cacheFile);
+		$this->refreshCache();
 	}
 
 	/**
@@ -234,7 +249,13 @@ class PackageProcessor{
 	 */
 	public function fetchConsoleOutput(){
 		$logFile = "{$this->cacheDir}/console.log";
-		return ['content' => ((is_file($logFile))? file_get_contents($logFile) : 'No console output.')];
+		if(is_file($logFile)){
+			$log = fopen($logFile, 'r');
+			$output = fread($log, filesize($logFile));
+			fclose($log);
+		} else
+			$output = 'No console output.';
+		return ['content' => $output];
 	}
 
 	/**
@@ -323,5 +344,14 @@ class PackageProcessor{
 		set_time_limit(0);
 		ignore_user_abort(true);
 		ini_set('memory_limit', '1G');
+	}
+
+	/**
+	 * Refreshing cache files after require, update or, remove operation.
+	 */
+	private function refreshCache(){
+		unlink("{$this->cacheDir}/installed.cache");
+		unlink("{$this->cacheDir}/all.cache");
+		$this->getAll();
 	}
 }

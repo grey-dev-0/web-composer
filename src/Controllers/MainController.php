@@ -50,12 +50,23 @@ class MainController extends Controller{
 		return response()->json(['response' => 0]);
 	}
 
+	public function postUpgradePacakge(){
+		$this->packageProcessor->upgradePackage(Request::input('package'));
+		return response()->json(['response' => 0]);
+	}
+
+	public function postTaskUpgradePackage(){
+		$this->packageProcessor->consoleLog = fopen('storage/composer/console.log', 'a');
+		$this->packageProcessor->taskUpgradePackage(Request::input('package'), Request::input('version'));
+		fclose($this->packageProcessor->consoleLog);
+	}
+
 	public function postRemovePackage(){
 		$this->packageProcessor->removePackage(Request::input('package'));
 	}
 
 	public function postTaskRemovePackage(){
-		$this->packageProcessor->consoleLog = fopen('storage/composer/console.log', 'a+');
+		$this->packageProcessor->consoleLog = fopen('storage/composer/console.log', 'a');
 		$this->packageProcessor->taskRemovePackage(Request::input('package'));
 		fclose($this->packageProcessor->consoleLog);
 	}

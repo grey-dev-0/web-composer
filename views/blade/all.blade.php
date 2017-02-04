@@ -46,7 +46,7 @@
 			@else
 				<div class="card card-outline-info">
 					<div class="card-block">
-						<i class="material-icons text-info" style="vertical-align:middle;margin-bottom:4px">info_outline</i> All packages caching process has been started, please come back again after a while..
+						<i class="material-icons text-info" style="vertical-align:middle;margin-bottom:4px">info_outline</i> All packages cache is being refreshed, please come back again after a while..
 					</div>
 				</div>
 			@endif
@@ -80,7 +80,9 @@
 		var urls = {
 			consoleOutput: '{{url(config('web-composer.prefix').'/console')}}',
 			packagesListing: '{{url(config('web-composer.prefix').'/ajax-all')}}',
+			removePackage: '{{url(config('web-composer.prefix').'/remove-package')}}',
 			refreshPackage: '{{url(config('web-composer.prefix').'/refresh-package')}}',
+			updatePackage: '{{url(config('web-composer.prefix').'/upgrade-package')}}',
 			searchPackages: '{{url(config('web-composer.prefix').'/ajax-search/all')}}'
 		}
 	</script>

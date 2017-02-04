@@ -65,6 +65,8 @@
 			consoleOutput: '{{url(config('web-composer.prefix').'/console')}}',
 			packagesListing: '{{url(config('web-composer.prefix').'/ajax-installed')}}',
 			removePackage: '{{url(config('web-composer.prefix').'/remove-package')}}',
+			refreshPackage: '{{url(config('web-composer.prefix').'/refresh-package')}}',
+			updatePackage: '{{url(config('web-composer.prefix').'/upgrade-package')}}',
 			searchPackages: '{{url(config('web-composer.prefix').'/ajax-search/installed')}}'
 		};
 	</script>
