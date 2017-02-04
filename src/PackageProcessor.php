@@ -334,7 +334,7 @@ class PackageProcessor{
 		$this->composer->setAutoExit(false);
 		$this->consoleOutput = (is_null($this->consoleLog))?
 			new BufferedOutput() : new StreamOutput($this->consoleLog);
-		putenv('COMPOSER_HOME='.storage_path());
+		putenv("COMPOSER_HOME={$this->cacheDir}");
 	}
 
 	/**
@@ -352,6 +352,5 @@ class PackageProcessor{
 	private function refreshCache(){
 		unlink("{$this->cacheDir}/installed.cache");
 		unlink("{$this->cacheDir}/all.cache");
-		$this->getAll();
 	}
 }

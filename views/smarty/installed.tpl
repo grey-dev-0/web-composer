@@ -8,7 +8,13 @@
 <div class="row">
 	<div class="col-xs-12">
 		<h4 class="float-xs-left">Installed Packages</h4>
-		<input type="text" placeholder="Search" id="search" class="form-control float-xs-right card-outline-info">
+		<div id="search">
+			<input type="text" placeholder="Search" class="form-control float-xs-right card-outline-info">
+			<div id="search-actions">
+				<i class="material-icons" id="search-btn">search</i>
+				<i class="material-icons text-muted hidden-xs-up hidden-xs-down" id="search-clear">clear</i>
+			</div>
+		</div>
 	</div>
 	<div class="col-xs-12">
 		<div class="card card-outline-success">
@@ -50,8 +56,16 @@
 
 {block name='scripts'}
 <script type="text/javascript">
-	urls = { packagesListing: '' }
+	var urls = {
+		consoleOutput: '/{#prefix#}/console',
+		packagesListing: '/{#prefix#}/ajax-all',
+		removePackage: '/{#prefix#}/remove-package',
+		refreshPackage: '/{#prefix#}/refresh-package',
+		updatePackage: '/{#prefix#}/upgrade-package',
+		searchPackages: '/{#prefix#}/ajax-search/installed'
+	};
 </script>
 <script type="text/javascript" src="{#baseUrl#}/assets/js/bootbox.min.js"></script>
+<script type="text/javascript" src="{#baseUrl#}/assets/js/console.min.js"></script>
 <script type="text/javascript" src="{#baseUrl#}/assets/js/packages.min.js"></script>
 {/block}
