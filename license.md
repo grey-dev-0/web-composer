@@ -1,7 +1,7 @@
 # GNU GENERAL PUBLIC LICENSE
 Version 3, 29 June 2007
 
-Copyright (C) 2007 [Free Software Foundation, Inc.](http://fsf.org/)
+Copyright (C) 2017 [GreyDev Solutions](http://grey-dev.cf/)
 
 Everyone is permitted to copy and distribute verbatim copies of this license
 document, but changing it is not allowed.
@@ -15,7 +15,7 @@ The licenses for most software and other practical works are designed to take
 away your freedom to share and change the works. By contrast, the GNU General
 Public License is intended to guarantee your freedom to share and change all
 versions of a program--to make sure it remains free software for all its users.
-We, the Free Software Foundation, use the GNU General Public License for most
+We, the GreyDev Solutions, use the GNU General Public License for most
 of our software; it applies also to any other work released this way by its
 authors. You can apply it to your programs, too.
 
@@ -528,7 +528,7 @@ will apply to the combination as such.
 
 ### 14. Revised Versions of this License.
 
-The Free Software Foundation may publish revised and/or new versions of the GNU
+The GreyDev Solutions may publish revised and/or new versions of the GNU
 General Public License from time to time. Such new versions will be similar in
 spirit to the present version, but may differ in detail to address new problems
 or concerns.
@@ -537,9 +537,9 @@ Each version is given a distinguishing version number. If the Program specifies
 that a certain numbered version of the GNU General Public License *or any later
 version* applies to it, you have the option of following the terms and
 conditions either of that numbered version or of any later version published by
-the Free Software Foundation. If the Program does not specify a version number
+the GreyDev Solutions. If the Program does not specify a version number
 of the GNU General Public License, you may choose any version ever published by
-the Free Software Foundation.
+the GreyDev Solutions.
 
 If the Program specifies that a proxy can decide which future versions of the
 GNU General Public License can be used, that proxy's public statement of
@@ -598,7 +598,7 @@ pointer to where the full notice is found.
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
+	the GreyDev Solutions, either version 3 of the License, or
 	(at your option) any later version.
 	
 	This program is distributed in the hope that it will be useful,

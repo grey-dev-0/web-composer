@@ -8,16 +8,27 @@ Therefore, I made this small package that gives access to developers where they 
 
 ## Features
 - Searching for packages installed or all packages from packagist.org.
-- Installing new composer packages.
+- Installing new composer packages with the version you specify.
 - Updating / downgrading existing composer packages.
 - Removing existing composer packages.
-  - **NOTE:** don't forget to refactor your source before removing to avoid errors on accessing the removed library.
+    - **NOTE:** don't forget to refactor your source before removing to avoid errors on accessing the removed library.
 - Showing list of dependencies of any package *(currently broken)*.
 - Web console output showing the progress of all requested operations.
 - Better support for Laravel framework version 5.0 and onwards.
+- Applying your protective authentication middleware on the panel (currently for Laravel projects only).
+
+## Usage Documentation
+Please refer to one of the following documentations:
+
+- [For developers using Laravel framework](https://github.com/grey-dev-0/web-composer/wiki/Usage-with-Laravel)
+- [For developers using other frameworks or no framework at all](https://github.com/grey-dev-0/web-composer/Usage-with-Others)
 
 ## Credit
-This library implements the original composer application commands into a web interface so, all credit really goes for the creators of composer.
+This library implements the original composer application commands into a web interface so, all credit really goes for the creators of [composer](http://getcomposer.org).
+
+### Limitations
+- This package calls composer functions in background using cURL requests so, if a web server application e.g. nginx has too short timeout limit this might prevent the functions from being completed.
+- The output console featured in this library is not synced by websocket connection due to its unavailability on some servers however, it's synced periodically once an operation is requested, and that sync function might be toggled on and off.
 
 ### License
 This library is provided freely at NO WARRANTY and, no permissions are required for modifying it in any way that suits its users. Collaborations and ideas are also welcome, for any suggestions you can send them to mo7y.66@gmail.com and, I'll look into them as soon as I can. 
