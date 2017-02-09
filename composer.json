@@ -1,6 +1,6 @@
 {
 	"name": "grey-dev-0/web-composer",
-	"version": "0.9",
+	"version": "0.9p",
 	"license": "MIT",
 	"description": "A module that enables developers to install, remove and, update composer packages from web.",
 	"authors": [

@@ -249,8 +249,7 @@ class PackageProcessor{
 	 */
 	public function fetchConsoleOutput(){
 		$logFile = "{$this->cacheDir}/console.log";
-		$logSize = filesize($logFile);
-		if(is_file($logFile) && $logSize > 0){
+		if(is_file($logFile) && ($logSize = filesize($logFile)) > 0){
 			$log = fopen($logFile, 'r');
 			$output = fread($log, $logSize);
 			fclose($log);
