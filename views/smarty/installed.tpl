@@ -62,7 +62,8 @@
 		removePackage: '/{#prefix#}/remove-package',
 		refreshPackage: '/{#prefix#}/refresh-package',
 		updatePackage: '/{#prefix#}/upgrade-package',
-		searchPackages: '/{#prefix#}/ajax-search/installed'
+		searchPackages: '/{#prefix#}/ajax-search/installed',
+		clearConsole: '/{#prefix#}/clear-console'
 	};
 </script>
 <script type="text/javascript" src="{#baseUrl#}/assets/js/bootbox.min.js"></script>

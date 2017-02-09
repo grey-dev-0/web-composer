@@ -28,6 +28,7 @@ This library implements the original composer application commands into a web in
 
 ### Limitations
 - This package calls composer functions in background using cURL requests so, if a web server application e.g. nginx has too short timeout limit this might prevent the functions from being completed.
+    - Memory limit is set internally to 1 GB, time limit is removed and, user disconnection is disregarded in php but, it's not guaranteed that the library's background functions would continue if web server application e.g. nginx times out.
 - The output console featured in this library is not synced by websocket connection due to its unavailability on some servers however, it's synced periodically once an operation is requested, and that sync function might be toggled on and off.
 
 ### License

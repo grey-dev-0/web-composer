@@ -17,6 +17,17 @@
 			font-size: 0.8em;
 			padding-top: 0.2em;
 		}
+		#refresh-console{
+			padding: 2px 2px 0;
+			i.material-icons{
+				font-size: 1.4em;
+				&.in-sync{
+					-webkit-animation: rotate-right 1s linear infinite;
+					-o-animation: rotate-right 1s linear infinite;
+					animation: rotate-right 1s linear infinite;
+				}
+			}
+		}
 	}
 	#console-content{
 		background-color: #000000;

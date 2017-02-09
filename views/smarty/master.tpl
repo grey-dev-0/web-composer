@@ -32,6 +32,8 @@
 		<div id="console-tab" class="bg-faded">
 			<div class="float-xs-left text-muted">&copy;{date('Y')} GreyDev Web Solutions Development</div>
 			<div class="float-xs-right">
+				<div class="btn btn-outline-info btn-sm" id="refresh-console"><i class="material-icons">sync</i></div>
+				<div class="btn btn-outline-warning btn-sm" id="clear-console">Clear</div>
 				<div class="btn btn-secondary btn-sm" id="open-console">Console</div>
 			</div>
 		</div>

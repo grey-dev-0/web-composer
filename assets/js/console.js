@@ -7,6 +7,7 @@
 	 */
 	g.ComposerConsole = function(inputUrl){
 		this.url = inputUrl;
+		this.interval = null;
 		this.init();
 	};
 
@@ -27,9 +28,25 @@
 			});
 		},
 		/**
-		 * Refreshing Console output data.
+		 * Toggles console output auto-refresh functionality
 		 */
-		refresh: function(){ this.init(); },
+		autoRefresh: function(){
+			var composerConsole = this;
+			if(this.interval === null)
+				this.interval = setInterval(function(){
+					var consoleContent = $('#console-content');
+					var oldText = consoleContent.find('code').text();
+					composerConsole.init();
+					if(oldText != composerConsole.content){
+						consoleContent.find('code').text(composerConsole.content);
+						consoleContent.scrollTop(consoleContent.find('pre').height());
+					}
+				}, 2500);
+			else{
+				clearInterval(this.interval);
+				this.interval = null;
+			}
+		},
 		/**
 		 * Viewing Console output data in a custom bootbox dialog.
 		 */
@@ -40,6 +57,17 @@
 			if(this.content == '')
 				this.content = 'Console output is empty.';
 			consoleView.html('<pre><code>'+this.content+'</code></pre>');
+		},
+		/**
+		 * Clearing console output file.
+		 */
+		clear: function(){
+			$.ajax({
+				url: urls.clearConsole,
+				type: 'GET',
+				success: function(){ $('#console-content').find('code').text('Console is cleared.'); },
+				error: this.error
+			});
 		},
 		/**
 		 * Showing an error message while logging the error occurred in the developer console.

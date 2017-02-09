@@ -88,6 +88,13 @@ $(document).ready(function(){
 	}).on('click', '#open-console', function(){
 		// Opening console view.
 		composerConsole.view();
+	}).on('click', '#clear-console', function(){
+		// Clearing console output.
+		composerConsole.clear();
+	}).on('click', '#refresh-console', function(){
+		// Refreshing console output.
+		composerConsole.autoRefresh();
+		$('#refresh-console').find('i').toggleClass('in-sync');
 	}).on('click', '#search-btn', search).on('change', '#search input', function(evt){
 		// Searching for a package
 		if($(this).val() != '')

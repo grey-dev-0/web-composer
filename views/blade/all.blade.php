@@ -83,7 +83,8 @@
 			removePackage: '{{url(config('web-composer.prefix').'/remove-package')}}',
 			refreshPackage: '{{url(config('web-composer.prefix').'/refresh-package')}}',
 			updatePackage: '{{url(config('web-composer.prefix').'/upgrade-package')}}',
-			searchPackages: '{{url(config('web-composer.prefix').'/ajax-search/all')}}'
+			searchPackages: '{{url(config('web-composer.prefix').'/ajax-search/all')}}',
+			clearConsole: '{{url(config('web-composer.prefix').'/clear-console')}}'
 		};
 	</script>
 	<script type="text/javascript" src="{{asset('public/vendor/grey-dev-0/web-composer/js/bootbox.min.js')}}"></script>

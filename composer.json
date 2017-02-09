@@ -15,7 +15,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"GreyDev\\ConfigExtension\\": "src/"
+			"GreyDev\\WebComposer\\": "src/"
 		}
 	}
 }
