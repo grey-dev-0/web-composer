@@ -74,4 +74,8 @@ class MainController extends Controller{
 	public function getConsole(){
 		return response()->json($this->packageProcessor->fetchConsoleOutput());
 	}
+
+	public function getClearConsole(){
+		return response()->json($this->packageProcessor->clearConsole());
+	}
 }

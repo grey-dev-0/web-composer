@@ -14,6 +14,7 @@ Route::group([
 	Route::post('upgrade-package', 'MainController@postUpgradePacakge');
 	Route::post('remove-package', 'MainController@postRemovePackage');
 	Route::get('console', 'MainController@getConsole');
+	Route::get('clear-console', 'MainController@getClearConsole');
 });
 
 Route::group([

@@ -259,6 +259,18 @@ class PackageProcessor{
 	}
 
 	/**
+	 * Clearing console output log.
+	 *
+	 * @return array Response code in case of success.
+	 */
+	public function clearConsole(){
+		$logFile = "{$this->cacheDir}/console.log";
+		if(is_file($logFile))
+			file_put_contents($logFile, '');
+		return ['response' => 0];
+	}
+
+	/**
 	 * Requesting a background task to be run.
 	 *
 	 * @param $url string Task URL to be called.

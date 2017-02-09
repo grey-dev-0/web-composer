@@ -95,6 +95,10 @@ class MainController{
 		$this->jsonRespond($this->packageProcessor->fetchConsoleOutput());
 	}
 
+	public function getClearConsole(){
+		$this->jsonRespond($this->packageProcessor->clearConsole());
+	}
+
 	private function view($template, $data = []){
 		foreach($data as $name => &$value)
 			$this->viewer->assign($name, $value);
