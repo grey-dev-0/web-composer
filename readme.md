@@ -21,7 +21,7 @@ Therefore, I made this small package that gives access to developers where they 
 Please refer to one of the following documentations:
 
 - [For developers using Laravel framework](https://github.com/grey-dev-0/web-composer/wiki/Usage-with-Laravel)
-- [For developers using other frameworks or no framework at all](https://github.com/grey-dev-0/web-composer/Usage-with-Others)
+- [For developers using other frameworks or no framework at all](https://github.com/grey-dev-0/web-composer/wiki/Usage-with-Others)
 
 ## Credit
 This library implements the original composer application commands into a web interface so, all credit really goes for the creators of [composer](http://getcomposer.org).
